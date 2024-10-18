@@ -21,18 +21,26 @@
     #define UDG_OFFSET 0
 #endif
 
+#define _COLOR_ADDR 0x7800
 
-void _displayShort(uint16_t value)
+
+
+// void _XL_PRINTD(register uint8_t x, uint8_t y, uint8_t length, register uint16_t value)
+void _displayShort(uint8_t x, register uint16_t value)
 { 
     uint8_t i; 
+    uint8_t old;
+    uint16_t addr;
 
-    for(i=1;i<6;++i) 
+    for(i=0;i<5;++i) 
     { 
-        value -= POKE(BASE_ADDR+6-i,(uint8_t) ((value)%10)); 
+        old = value%10;
+        addr = BASE_ADDR+4+x-i;
+        value -= POKE(addr,(uint8_t) ((value)%10));
         value/=10; 
-        POKE(BASE_ADDR+6-i,UDG_OFFSET+48+PEEK(BASE_ADDR+6-i)); 
+        POKE(addr,UDG_OFFSET+48+old); 
+        POKE(_COLOR_ADDR+addr,0x1);
     } 
-    POKE(BASE_ADDR+6,48+UDG_OFFSET); 
 }
 
 void _XL_PRINT(uint8_t x, uint8_t y, const char * str)
@@ -41,7 +49,7 @@ void _XL_PRINT(uint8_t x, uint8_t y, const char * str)
     while(str[i]!='\0')
     {
         POKE(loc(x+i,y), 192+str[i]); 
-        POKE((0x7800+loc(x+i,y)),0x01);
+        POKE((_COLOR_ADDR+loc(x+i,y)),0x01);
         ++i;
     }
 }	

@@ -40,7 +40,7 @@ const uint8_t tiles[] = {
 #define NUMBER_OF_COLORS 6
 #define MAX_STRING_SIZE 10
 
-#if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+#if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
     #define FIRST_COLOR _XL_BLACK
 #else
     #define FIRST_COLOR _XL_WHITE
@@ -48,11 +48,11 @@ const uint8_t tiles[] = {
 
 // TODO: This requires _XL_DRAW to be a macro 
 // that suppresses the last the color argument when _XL_NO_COLOR is set
-// #if !defined(_XL_NO_COLOR)
+#if !defined(_XL_NO_COLOR)
 static const uint8_t tile_color[NUMBER_OF_COLORS] = {
     FIRST_COLOR,
     _XL_RED, _XL_CYAN, _XL_GREEN, _XL_YELLOW, _XL_BLUE};
-// #endif
+#endif
 
 const char strings[NUMBER_OF_COLORS][MAX_STRING_SIZE] = 
 {
@@ -67,7 +67,7 @@ const char strings[NUMBER_OF_COLORS][MAX_STRING_SIZE] =
 
 
 const char color_name[NUMBER_OF_COLORS][MAX_STRING_SIZE] = { 
-    #if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+    #if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
                                 "BLACK",
     #else
                                 "WHITE",

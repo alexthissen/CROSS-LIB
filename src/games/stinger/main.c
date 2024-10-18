@@ -197,7 +197,15 @@ uint8_t direction;
 #define speed_value fire_pressed
 #define power_value time_counter
 
+#if !defined(_XL_NO_COLOR)
 uint8_t wall_color;
+#endif
+
+#if !defined(_XL_NO_COLOR)
+	#define set_wall_color(color) wall_color=color
+#else
+	#define set_wall_color(color)
+#endif
 
 uint8_t extra_points_counter;
 
@@ -434,7 +442,7 @@ typedef struct ItemStruct Missile;
  Item powerUpItem;
  Item secretItem;
 
-#if !defined(NO_EXTRA_TITLE)
+// #if !defined(NO_EXTRA_TITLE)
 
 #define NUMBER_OF_ITEMS 4
 
@@ -453,9 +461,9 @@ typedef struct ItemStruct Missile;
     _XL_P _XL_O _XL_I _XL_N _XL_T _XL_S,
     _XL_F _XL_R _XL_E _XL_E _XL_Z _XL_E,
 };
-#endif
+// #endif
 
-#if !defined(NO_EXTRA_TITLE)
+// #if !defined(NO_EXTRA_TITLE)
  const uint8_t enemy_tile[5][2] = 
 {
     { LIGHT_TANK_TILE_0, _XL_WHITE },
@@ -473,7 +481,7 @@ typedef struct ItemStruct Missile;
     "HEAVY",
     "HOWITZER",
 };
-#endif
+// #endif
 
 
 Missile enemyMissile[MAX_NUMBER_OF_MISSILES];
@@ -567,6 +575,7 @@ void display_power_up_counter(void)
 
 void display_remaining_rockets(void)
 {
+	#if !defined(_XL_NO_COLOR)
     uint8_t color;
     
     if(remaining_rockets<20)
@@ -578,6 +587,7 @@ void display_remaining_rockets(void)
         color = _XL_WHITE;
     }
     _XL_SET_TEXT_COLOR(color);
+	#endif
     _XL_PRINTD(7,0,2,remaining_rockets);
 }
 
@@ -633,52 +643,59 @@ void display_stinger(void)
 }
 
 
+#if !defined(_XL_NO_COLOR)
+	#define set_tank_color(tank_color) color=tank_color
+#else
+	#define set_tank_color(tank_color)
+#endif
 
 void display_tank(void)
 {
     uint8_t status = tank_shape[tank_x];
     uint8_t pos = tank_y_array[tank_x];
+	#if !defined(_XL_NO_COLOR)
     uint8_t color;
+	#endif
     uint8_t tile0;
 
     tile0 = HEAVY_TANK_TILE_0;
 
     if(tank_level[tank_x]==1)
     {
-        color = _XL_GREEN;
+        set_tank_color(_XL_GREEN);
     }
     else if(tank_level[tank_x]==2)
     {
         if(!freeze)
         {
             tile0 = TANK_DEATH_TILE;
-            color = _XL_YELLOW;
+            set_tank_color(_XL_YELLOW);
         }
     }
     else if(!tank_level[tank_x])
     {
         tile0 = LIGHT_TANK_TILE_0;
-        color = _XL_WHITE;
+        set_tank_color(_XL_WHITE);
     }
     else if(tank_level[tank_x]==3)
     {
-        color = _XL_RED;
+        set_tank_color(_XL_RED);
     }
     else 
     {
         // tile0 = MORTAR_TILE;
         if(tank_level[tank_x]==4)
         {
-            color = _XL_GREEN;
+            set_tank_color(_XL_GREEN);
         }
         else
         {
-            color = _XL_RED;
+            set_tank_color(_XL_RED);
         }
     }
     if(freeze)
     {
-        color = _XL_CYAN;  
+        set_tank_color(_XL_CYAN);  
     }
 
     if(tank_level[tank_x]<=MAX_TANK_LEVEL)
@@ -1019,11 +1036,7 @@ void power_up_effect(void)
 {    
     ++powerUp;
     
-	#if defined(BUGGY_GCC_TI99)
-	if(powerUp==5 || powerUp==10 || powerUp==15 || powerUp==20 || powerUp==25 || powerUp==30 || powerUp==35)
-	#else
     if(!(powerUp%5))
-	#endif
     {
         activate_hyper();
     }
@@ -1331,7 +1344,9 @@ void handle_item(register Item* item)
                 _XL_DRAW(item->_x,item->_y,item_tile,0);
                 #endif
             }
- 
+
+// TODO: Use uint8_t player_x = (stinger_x>>1)+(stinger_x&1);
+// TODO: compare item_x with player_x to decide whether the player has to be redisplayed
             if((item->_counter>=EXPLOSION_THRESHOLD)&&(item->_x==(stinger_x>>1)+(stinger_x&1)))
             {
                 item->_effect();
@@ -2383,7 +2398,7 @@ do \
     artillery_shell_active = 0; \
     heavy_tank_counter = 0; \
     _XL_CLEAR_SCREEN(); \
-    wall_color = level_color[level&1]; \
+    set_wall_color(level_color[level&1]); \
     display_wall(BOTTOM_WALL_Y); \
     _XL_DRAW(0,HEIGHT_SHOOT_THRESHOLD,WALL_TILE,_XL_CYAN); \
     _XL_DRAW(XSize-1,HEIGHT_SHOOT_THRESHOLD,WALL_TILE,_XL_CYAN); \
@@ -2521,55 +2536,6 @@ void reset_tanks(void)
     // #define CONTROLS_Y YSize-3
 // #endif
 
-#if !defined(NO_EXTRA_TITLE)
-    #if !defined(NO_CONTROL_INSTRUCTIONS) && YSize>=15
-        void control_instructions(void) 
-        {
-            _XL_SET_TEXT_COLOR(_XL_WHITE);
-            PRINT_CENTERED_ON_ROW(CONTROLS_Y,\
-                                       CONTROLS_STRING);
-        }
-        void delete_instructions(void)
-        {
-            PRINT_CENTERED_ON_ROW(CONTROLS_Y,\
-                                       DELETE_CONTROLS);
-        }
-    #else
-        #define control_instructions()
-        #define delete_instructions()
-    #endif
-
-    #define display_items() \
-    do \
-    { \
-        uint8_t i; \
-        \
-        for(i=0;i<NUMBER_OF_ITEMS;++i) \
-        { \
-            _XL_DRAW(XSize/2-5,YSize/3+4+_NEXT_ROW, item_tile[i][0], item_tile[i][1]); \
-            _XL_SET_TEXT_COLOR(_XL_GREEN); \
-            _XL_PRINT(XSize/2-5+3,YSize/3+4+_NEXT_ROW, (char *)item_name[i]); \
-        } \
-    } while(0)
-        
-    void display_enemies(void)
-    {
-        uint8_t i;
-        
-        for(i=0;i<5;++i)
-        {
-            _XL_DRAW(XSize/2-5,YSize/3+1+_NEXT_ROW, enemy_tile[i][0], enemy_tile[i][1]);
-            _XL_SET_TEXT_COLOR(_XL_GREEN);
-            _XL_PRINT(XSize/2-5+3,YSize/3+1+_NEXT_ROW, (char *)enemy_name[i]);
-        }
-    }
-#else
-    #define display_items()
-    #define display_enemies()
-#endif
-
-
-
 
 
 #if YSize<=22
@@ -2593,7 +2559,7 @@ void display_cleared(void)
 
 }
 	
-#if !defined(_XL_NO_TEXT_COLOR)
+#if !defined(_XL_NO_TEXT_COLOR) && !defined(_XL_NO_COLOR)
 	void display_stinger_string(uint8_t color)
 	{
 		_XL_SET_TEXT_COLOR(color);
@@ -2601,11 +2567,13 @@ void display_cleared(void)
 	}
 
 
+	#if !defined(NO_EXTRA_TITLE)
 	void display_enemies_string(uint8_t color)
 	{
 		_XL_SET_TEXT_COLOR(color);
 		PRINT_CENTERED_ON_ROW(YSize/3-2, "ENEMIES");
 	}
+	#endif
 
 	void display_victory_string(uint8_t color)
 	{
@@ -2618,10 +2586,13 @@ void display_cleared(void)
 		PRINT_CENTERED_ON_ROW(YSize/3-2,_STINGER_STRING);
 	}
 
+	#if !defined(NO_EXTRA_TITLE)
+
 	void _display_enemies_string(void)
 	{
 		PRINT_CENTERED_ON_ROW(YSize/3-2, "ENEMIES");
 	}
+	#endif
 
 	void _display_victory_string(void)
 	{
@@ -2646,6 +2617,57 @@ uint8_t fire_pressed_after_time(void)
 }
 
 
+#if !defined(NO_EXTRA_TITLE) || YSize<15
+    // #if YSize>=15
+        void control_instructions(void) 
+        {
+            _XL_SET_TEXT_COLOR(_XL_WHITE);
+            PRINT_CENTERED_ON_ROW(CONTROLS_Y,\
+                                       CONTROLS_STRING);
+        }
+        void delete_instructions(void)
+        {
+            PRINT_CENTERED_ON_ROW(CONTROLS_Y,\
+                                       DELETE_CONTROLS);
+        }
+#else
+        #define control_instructions()
+        #define delete_instructions()
+    // #endif
+#endif
+    #define display_items() \
+    do \
+    { \
+        uint8_t i; \
+        \
+        for(i=0;i<NUMBER_OF_ITEMS;++i) \
+        { \
+            _XL_DRAW(XSize/2-5,YSize/3+4+_NEXT_ROW, item_tile[i][0], item_tile[i][1]); \
+            _XL_SET_TEXT_COLOR(_XL_GREEN); \
+            _XL_PRINT(XSize/2-5+3,YSize/3+4+_NEXT_ROW, (char *)item_name[i]); \
+        } \
+    } while(0)
+        
+    void display_enemies(void)
+    {
+        uint8_t i;
+        
+        for(i=0;i<5;++i)
+        {
+            _XL_DRAW(XSize/2-5,YSize/3+1+_NEXT_ROW, enemy_tile[i][0], enemy_tile[i][1]);
+            _XL_SET_TEXT_COLOR(_XL_GREEN);
+            _XL_PRINT(XSize/2-5+3,YSize/3+1+_NEXT_ROW, (char *)enemy_name[i]);
+        }
+    }
+// #else
+    // #define display_items()
+    // #define display_enemies()
+    // #define control_instructions()
+    // #define delete_instructions()
+// #endif
+
+
+#if !defined(NO_EXTRA_TITLE)
 void mortar_intro_animation(void)
 {
     uint8_t i;
@@ -2747,14 +2769,41 @@ void mortar_intro_animation(void)
     _XL_ZAP_SOUND();
     one_second();
 }
+#else
+#define mortar_intro_animation()
+#endif
 
-#if XSize>=18
+#if defined(_XL_NO_COLOR) || defined(_XL_NO_TEXT_COLOR)
 	#define display_initial_screen() \
 	do \
 	{ \
 		_XL_CLEAR_SCREEN(); \
 		\
-		wall_color = _XL_GREEN; \
+		set_wall_color(_XL_GREEN); \
+		display_wall(0); \
+		display_wall(BOTTOM_WALL_Y+1); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_CYAN); \
+		PRINT_CENTERED_ON_ROW(_HISCORE_Y, "HISCORE"); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_WHITE); \
+		_XL_PRINTD(XSize/2-3,_HISCORE_Y+1,5,hiscore); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_WHITE); \
+		PRINT_CENTERED_ON_ROW(YSize/3, "FABRIZIO CARUSO"); \
+		\
+		display_items(); \
+		tank_intro_animation(); \
+		_XL_ZAP_SOUND(); \
+		one_second();    \
+	} while(0)
+#elif XSize>=18
+	#define display_initial_screen() \
+	do \
+	{ \
+		_XL_CLEAR_SCREEN(); \
+		\
+		set_wall_color(_XL_GREEN); \
 		display_wall(0); \
 		display_wall(BOTTOM_WALL_Y+1); \
 		\
@@ -2774,31 +2823,31 @@ void mortar_intro_animation(void)
 		one_second();    \
 	} while(0)
 #else
-#define display_initial_screen() \
-do \
-{ \
-    _XL_CLEAR_SCREEN(); \
-    \
-    wall_color = _XL_GREEN; \
-    display_wall(0); \
-    display_wall(BOTTOM_WALL_Y+1); \
-    \
-    _XL_SET_TEXT_COLOR(_XL_CYAN); \
-    PRINT_CENTERED_ON_ROW(_HISCORE_Y, "HISCORE"); \
-    \
-    _XL_SET_TEXT_COLOR(_XL_WHITE); \
-    _XL_PRINTD(XSize/2-3,_HISCORE_Y+1,5,hiscore); \
-    \
-    _XL_SET_TEXT_COLOR(_XL_WHITE); \
-    PRINT_CENTERED_ON_ROW(YSize/3, "FABRIZIO"); \
-    PRINT_CENTERED_ON_ROW(YSize/3+1, "CARUSO"); \
-    \
-    display_items(); \
-	tank_intro_animation(); \
-    _XL_ZAP_SOUND(); \
-    display_stinger_string(_XL_CYAN); \
-    one_second();    \
-} while(0)	
+	#define display_initial_screen() \
+	do \
+	{ \
+		_XL_CLEAR_SCREEN(); \
+		\
+		set_wall_color(_XL_GREEN); \
+		display_wall(0); \
+		display_wall(BOTTOM_WALL_Y+1); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_CYAN); \
+		PRINT_CENTERED_ON_ROW(_HISCORE_Y, "HISCORE"); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_WHITE); \
+		_XL_PRINTD(XSize/2-3,_HISCORE_Y+1,5,hiscore); \
+		\
+		_XL_SET_TEXT_COLOR(_XL_WHITE); \
+		PRINT_CENTERED_ON_ROW(YSize/3, "FABRIZIO"); \
+		PRINT_CENTERED_ON_ROW(YSize/3+1, "CARUSO"); \
+		\
+		display_items(); \
+		tank_intro_animation(); \
+		_XL_ZAP_SOUND(); \
+		display_stinger_string(_XL_CYAN); \
+		one_second();    \
+	} while(0)	
 #endif
 
 void tank_intro_animation(void)
@@ -2831,11 +2880,16 @@ void tank_intro_animation(void)
     tank_y_array[XSize-2]=YSize-3;
     tank_level[XSize-2]=1;
 
+	#if defined(_XL_NO_TEXT_COLOR) || defined(_XL_NO_COLOR)
+	display_stinger_string(_XL_RED);
+	#endif
     do
     {
         for(i=3;i<(YSize-5)*4;++i)
         {
-            display_stinger_string(_XL_RED);			
+			#if !defined(_XL_NO_TEXT_COLOR) && !defined(_XL_NO_COLOR)
+            display_stinger_string(_XL_RED);
+			#endif
 			// if(fire_pressed_after_time())
             // {
                 // break;
@@ -2926,18 +2980,22 @@ void tank_intro_animation(void)
 }
 
 
+#if !defined(NO_EXTRA_TITLE)
 void display_second_screen(void) 
 {
     _XL_CLEAR_SCREEN();
     
-    wall_color = _XL_YELLOW;
+    set_wall_color(_XL_YELLOW);
     display_wall(0);
     display_wall(BOTTOM_WALL_Y+1);
     display_enemies();
     mortar_intro_animation();
     _XL_CLEAR_SCREEN(); \
 }
+#else
+#define display_second_screen() 
 
+#endif
 
 #if XSize>=31
     #define HI_X ((XSize-10))
@@ -3060,6 +3118,7 @@ void display_level_at_start_up(void)
         _XL_PRINT(XSize/2-4, YSize/2,      "LEVEL " );
         _XL_PRINTD(XSize/2+2,YSize/2,1,level+1);
     }
+	// #if !defined(NO_EXTRA_TITLE)
     if(level<LAST_LEVEL)
     {
         uint8_t i;
@@ -3070,7 +3129,7 @@ void display_level_at_start_up(void)
             _XL_DRAW(XSize/2+1-level+i*2, YSize/2+2, enemy_tile[i][0], enemy_tile[i][1]);
         }
     }
-    
+    // #endif
     one_second();
     control_instructions();
     sleep_and_wait_for_input();
@@ -3196,12 +3255,14 @@ void victory_animation(void)
     }    
     less_short_sleep();        
 
+	// #if !defined(NO_EXTRA_TITLE)
     for(i=0;i<=4;++i)
     {
         _XL_DRAW(XSize/2+1-level+i*2, YSize/2+2, enemy_tile[i][0], enemy_tile[i][1]);
         _XL_TOCK_SOUND();
         less_short_sleep();
     }    
+	// #endif
 
     for(j=0;j<5;++j)
     {
@@ -3232,6 +3293,7 @@ void victory_animation(void)
     {
 		k=XSize/2+1-level+i*2;
 
+		// #if !defined(NO_EXTRA_TITLE)
         for(j=0;j<9;++j)
         {
             _XL_DRAW(k, YSize/2+2, enemy_tile[i][0], enemy_tile[i][1]);
@@ -3239,6 +3301,7 @@ void victory_animation(void)
             _XL_DRAW(k, YSize/2+2, EXPLOSION_TILE, _XL_RED);
             short_sleep();
         }
+		// #endif
         _XL_EXPLOSION_SOUND();
         _XL_SLOW_DOWN(12U*_XL_SLOW_DOWN_FACTOR);        
         _XL_DELETE(k, YSize/2+2);
@@ -3413,9 +3476,13 @@ int main(void)
 
     hiscore = 0;
 
+	#if defined(_XL_NO_COLOR) || defined(_XL_NO_TEXT_COLOR)
+		display_stinger_string(_XL_CYAN);
+	#endif
     while(1) // Game (re-)start
     {
         global_initialization();
+
         display_initial_screen();
         display_second_screen();
         

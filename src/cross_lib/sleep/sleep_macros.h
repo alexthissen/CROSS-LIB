@@ -38,8 +38,16 @@
         #endif    
     #endif
 
+    #if defined(__VIC20__)
+        #define MAX_XL_SLOW_DOWN_FACTOR 20000u
+    #else
+        #define MAX_XL_SLOW_DOWN_FACTOR 65534U
+    #endif
+
     #if defined(_XL_NO_SLEEP)
         #define _XL_SLEEP(s)
+    #elif defined(_XL_NO_SLEEP_SEC)
+        #define _XL_SLEEP(s) _XL_SLOW_DOWN(MAX_XL_SLOW_DOWN_FACTOR)
     #elif defined(__ALT_SLEEP)
         void _XL_SLEEP(uint8_t s);
     #else

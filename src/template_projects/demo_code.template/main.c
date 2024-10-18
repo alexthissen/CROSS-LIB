@@ -55,11 +55,12 @@ const uint8_t tiles[] = {
 		_TILE_12, _TILE_13, _TILE_14, _TILE_15, 
 		_TILE_16, _TILE_17, _TILE_18, _TILE_19,
 		_TILE_20, _TILE_21, _TILE_22, _TILE_23, 
-        _TILE_24, _TILE_25
+        _TILE_24, _TILE_25, _TILE_26
 		};
 
-
+#if !defined(_XL_NO_COLOR)
 static const uint8_t tile_color[NUMBER_OF_COLORS] = {_XL_WHITE, _XL_RED, _XL_CYAN, _XL_GREEN, _XL_YELLOW, _XL_BLUE};
+#endif
 
 
 const char color_name[NUMBER_OF_COLORS][MAX_STRING_SIZE] = { 

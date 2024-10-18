@@ -11,7 +11,11 @@
 #if defined(__MEMORY_MAPPED_GRAPHICS)
 
 	#  if defined(__C64__) || defined(__C128__)
-		#if defined(DOUBLE_BUFFER)
+		#if defined(__DOUBLE_BUFFER)
+			// #define BASE_ADDR 0x9800
+			// #define COLOR_ADDR 0x9C00
+			// #define REAL_BASE_ADDR 0xC000
+			// #define REAL_COLOR_ADDR 0xD800
 			#define BASE_ADDR 0xB800
 			#define COLOR_ADDR 0xBC00
 			#define REAL_BASE_ADDR 0xC000
@@ -28,8 +32,16 @@
 		#define BASE_ADDR 0x1000
 		#define COLOR_ADDR 0x9400
 	#elif defined(__C16__)
-		#define BASE_ADDR 0x0C00
-		#define COLOR_ADDR 0x0800
+		#if defined(__DOUBLE_BUFFER)
+            #define BASE_ADDR 0x2B00
+            // #define COLOR_ADDR 0x3000
+            #define REAL_BASE_ADDR 0x0C00
+            // #define REAL_COLOR_ADDR 0x0800
+        #else
+            #define BASE_ADDR 0x0C00
+            // #define COLOR_ADDR 0x0800
+        #endif
+        #define COLOR_ADDR 0x0800
 	#elif defined(__GAL__)
 		#define BASE_ADDR 0x2800
 	#elif defined(__COCO__) || defined(__DRAGON__)
@@ -101,7 +113,14 @@
 		#define COLOR_POKE(addr, color) DISPLAY_POKE(addr, color)
 	#endif
 
-	void _XL_DRAW(uint8_t x, uint8_t y, uint8_t tile, uint8_t color);
+    #if !defined(_XL_NO_COLOR)
+        void _XL_DRAW(uint8_t x, uint8_t y, uint8_t tile, uint8_t color);
+    #else
+        void __DRAW_NO_COLOR(uint8_t x, uint8_t y, uint8_t tile);
+        #define _XL_DRAW(x, y, tile, color) __DRAW_NO_COLOR(x,y,tile)
+    
+    #endif
+    
 
 	void _XL_DELETE(uint8_t x,uint8_t y);
 

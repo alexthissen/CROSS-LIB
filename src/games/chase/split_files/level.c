@@ -112,7 +112,7 @@ extern Character bombs[BOMBS_NUMBER];
 #endif
 
 
-#if !defined(NO_WALL)
+#if !defined(NO_WALL) && !defined(TINY_GAME)
 
     extern Image HORIZONTAL_BRICK_IMAGE;
     extern Image VERTICAL_BRICK_IMAGE;
@@ -161,11 +161,7 @@ extern Character bombs[BOMBS_NUMBER];
 
     uint8_t oneMissileLevel(void)
     {
-        #if defined(BUGGY_MOD5)
-            return (level==3) || (level==8) || (level==11) || (level==16) || (level==5);
-        #else
-            return ((level%5)==3) || (level==5);  
-        #endif
+        return ((level%5)==3) || (level==5);  
     }
 
     uint8_t rocketLevel(void)
@@ -175,25 +171,12 @@ extern Character bombs[BOMBS_NUMBER];
 
     uint8_t missileLevel(void)
     {
-        #if defined(BUGGY_MOD5)
-            return (level==4) || (level==9) || (level==14) || (level==19);
-        #else
-            return (level%5)==4;
-        #endif
+        return (level%5)==4;
     }    
 
     uint8_t bossLevel(void)
-    {
-        
-        #if defined(BUGGY_MOD5)
-            if(level==5 || level==10 || level==15 || level==20)
-            {
-                return 1;
-            }
-            return 0;
-        #else
-            return !(level%5);
-        #endif
+    {        
+        return !(level%5);
     }
     
     uint8_t horizWallsLevel(void)
@@ -254,6 +237,29 @@ void spiral(register Character *characterPtr)
 
 #endif
 
+#if defined(TINY_GAME)
+    #define DRAW_BORDERS() \
+    do \
+    { \
+        uint8_t i; \
+        uint8_t j; \
+        for(i=0;i<YSize;++i) \
+        { \
+            for(j=0;j<XSize;j+=XSize-1) \
+            { \
+                _XL_DRAW(j,i,_BOMB_TILE,_XL_YELLOW); \
+            } \
+        } \
+    } \
+    while(0)
+#else
+    #define DRAW_BORDERS() \
+        _XL_SET_TEXT_COLOR(WALL_COLOR); \
+        DRAW_HORIZONTAL_BORDER(0); \
+        DRAW_HORIZONTAL_BORDER(YSize-1); \
+        DRAW_VERTICAL_BORDER(0); \
+        DRAW_VERTICAL_BORDER(XSize-1); 
+#endif
 
 void fillLevelWithCharacters(void)
 {
@@ -279,9 +285,9 @@ void fillLevelWithCharacters(void)
     }
     #endif
     
-    #if !defined(TINY_GAME) && !defined(NO_BORDERS)
+    // #if !defined(TINY_GAME) && !defined(NO_BORDERS)
         DRAW_BORDERS();
-    #endif    
+    // #endif    
     
     #if defined(FULL_GAME)
 
@@ -391,6 +397,5 @@ void fillLevelWithCharacters(void)
         #endif
         
     #endif
-    
 }
 

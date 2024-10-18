@@ -3,7 +3,7 @@
 # CROSS LIB
 ![LOGO](snapshots/CrossLibLogoByHamletShorter.jpg)
 
-*Cross-Lib* and games that use it (e.g., Cross Chase, Cross Shoot, Cross Bomber, Cross Snake, Cross Horde, Cross Verbix)
+*Cross-Lib* and games that use it (e.g., Chase, Shoot, Bomber, Snake, Horde, Verbix, Shuriken, Stinger, Trex)
 
 by Fabrizio Caruso (fabrizio_caruso@hotmail.com)
 
@@ -60,14 +60,15 @@ Play the games online:
 
 https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md
 
-1. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#stinger"><b>Stinger</b></a> is a tank-shooter with several enemies, levels, power-ups and items to pick.
-2. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#shuriken"><b>Shuriken</b></a> is somehow inspired by Pac-man and Pengo.
-3. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#verbix"><b>Verbix</b></a> is a Scrabble-like game that looks like Tetrix with letters.
-4. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#horde"><b>Horde</b></a> is a zombie shooter with several different enemies, levels, power-ups and special items to pick.
-5. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#snake"><b>Snake</b></a> is my personal re-interpretation of Nibbler (arcade game) to which I have added more game elements
-6. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#bomber"><b>Bomber</b></a> is a mini-game and clone of Air Attack (aka Blitz).
-7. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#shoot"><b>Shoot</b></a> is a shooter somehow similar to Robotron. It has many items and secrets to discover.
-8. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#chase"><b>Chase</b></a> is somehow similar to *Gnome Robots* but in real-time game and with several items and power-ups.
+1. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#trex"><b>Trex</b></a> is a mini-game and an obvious clone of off-line Chrome T-Rex game.
+2. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#stinger"><b>Stinger</b></a> is a tank-shooter with several enemies, levels, power-ups and items to pick.
+3. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#shuriken"><b>Shuriken</b></a> is somehow inspired by Pac-man and Pengo.
+4. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#verbix"><b>Verbix</b></a> is a Scrabble-like game that looks like Tetrix with letters.
+5. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#horde"><b>Horde</b></a> is a zombie shooter with several different enemies, levels, power-ups and special items to pick.
+6. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#snake"><b>Snake</b></a> is my personal re-interpretation of Nibbler (arcade game) to which I have added more game elements
+7. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#bomber"><b>Bomber</b></a> is a mini-game and clone of Air Attack (aka Blitz).
+8. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#shoot"><b>Shoot</b></a> is a shooter somehow similar to Robotron. It has many items and secrets to discover.
+9. <a href="https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/GAMES.md#chase"><b>Chase</b></a> is somehow similar to *Gnome Robots* but in real-time game and with several items and power-ups.
 
 -------------------------------------------
 
@@ -127,8 +128,8 @@ In most cases the user will just have to
 
 The `xl` script will trigger the full build process which will produce the target specific version of the project 
 or massively build the same project for several targets (or even build several projects for one or more targets).
-For example for the build of a project for the sole GameBoy target we may repressent 
-the interractions of various Cross-Lib components with this diagram:
+For example for the build of a project for the sole GameBoy target we may represent 
+the interactions of various Cross-Lib components with this diagram:
 
 ![User](snapshots/CrossLibFlow8.png)
 
@@ -142,9 +143,31 @@ For more details on the supported compilers we refer to:
 
 https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/COMPILERS.md
 
+Thanks to Alex Thissen, a version of Cross-Lib with (Z88DK, CC65, CMOC and native compilers) is available as a Docker image (to be built by using the provided Dockerfile) with a devcontainer configuration.
+
 -------------------------------------------
 
-## PREREQUISITES
+## NO LOCAL INSTALLATION
+
+Having a Dockerfile and a devcontainer configuration means that anyone with a GitHub account can just clone this repository and run it with GitHub CodeSpaces (free of charge with some restrictions): https://github.com/codespaces.
+
+-------------------------------------------
+## LOCAL DOCKER
+
+The dockerized version of Cross-Lib can used by 
+- by cloning this repository into a directory (let us refer to it as `<local_cross-lib>`);
+- by building the docker image that contains the dependencies with 
+
+```docker build . -t crosslib:<version>```;
+
+- by running the docker container and mapping the cloned repository into a directory (e.g. `/workspaces/crosslib`) in the container with
+
+```docker run -it -v <local_cross-lib>:/workspaces/crosslib --env-file <local_cross-lib>/.devcontainer/devcontainer.env crosslib:<version> bash```
+- (once in the docker container) by entering `workspaces/crosslib/src` and running `xl` commands.
+
+-------------------------------------------
+
+## LOCAL NON-DOCKER INSTALLATION - PREREQUISITES
 
 Cross-Lib is meant to be used under a POSIX environment (Windows+Cygwin, Linux, etc.).
 
@@ -164,9 +187,9 @@ https://github.com/Fabrizio-Caruso/CROSS-LIB/blob/master/docs/PREREQUISITES.md
 
 
 -------------------------------------------
-## INSTALLATION OF THE TOOL-CHAIN
+## LOCAL NON-DOCKER INSTALLATION OF THE TOOL-CHAIN
 
-The tool-chain Cross-Lib can be installed on different POSIX-compliant enviroments.
+The tool-chain Cross-Lib can be installed on different POSIX-compliant environments.
 It has been tested on:
 - Windows (7, 10) + `Cygwin`
 - Linux Ubuntu 18.04 under the Windows Subsystem
@@ -192,7 +215,7 @@ For Windows + Cygwin the tested and verified installation procedure uses:
 - `LCC1802` is installed under Windows by simply decompressing its released binary version (https://github.com/bill2009/lcc1802/releases).
 
 ### Under Linux
-For Linux (native or under thw Windows Subsystem), the tested and verified procedure both standard repositories and installation from sources.
+For Linux (native or under the Windows Subsystem), the tested and verified procedure both standard repositories and installation from sources.
 
 A detailed procedure for recent Ubuntu distributions is described here: 
 

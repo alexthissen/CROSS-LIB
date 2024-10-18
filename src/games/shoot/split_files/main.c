@@ -479,9 +479,11 @@ int main(void)
             
             if(isBossLevel)
             {
+                #if !defined(LESS_TEXT)
                 printKillTheSkulls();
                 _XL_SLEEP(1);
                 _XL_WAIT_FOR_INPUT();
+                #endif
                 ghostCount = 0;
             }
             _XL_CLEAR_SCREEN();
@@ -691,11 +693,7 @@ int main(void)
                     }
                     else if(isInnerHorizontalWallLevel)
                     {
-                        #if defined(BUGGY_HORIZ_DRAW)
-                        DRAW_HORIZONTAL_LINE(1+(XSize>>1)-(innerHorizontalWallLength>>1), YSize/2, innerHorizontalWallLength);
-                        #else
                         DRAW_HORIZONTAL_LINE((XSize>>1)-(innerHorizontalWallLength>>1), YSize/2, innerHorizontalWallLength);
-                        #endif
                     }
                     displayBombs();                                                        
                 }

@@ -130,11 +130,14 @@ void _XL_INIT_GRAPHICS(void)
 
     #if defined(__COMX__) || defined(__PECOM__) || defined(__CIDELSA__) || defined(__MICRO__)
     
-        #if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+        #if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
             (void) bgcolor(7);
         #else
             (void) bgcolor(0);
         #endif
+        
+        // bgcolor(__BACKGROUND_COLOR); 
+        
     	textcolordefinition(3);
         monochrome(0);
     #endif

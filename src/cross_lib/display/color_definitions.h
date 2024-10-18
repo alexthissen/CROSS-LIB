@@ -22,7 +22,7 @@
     #define _XL_BLACK (16*BLACK)
 
 #elif defined(__MO5__)
-    #if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+    #if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
         #define _XL_BLACK (0+7)
         #define _XL_RED (16+7)
         #define _XL_GREEN (32+7)
@@ -240,7 +240,10 @@
     #define _XL_BLACK _CREAT_WHITE
 
 #elif (defined(__APPLE2__) || defined(__APPLE2ENH__)) && defined(__APPLE2_HGR_GRAPHICS)
-    #if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+	// TODO: This has to be fixed probably by avoiding __BACKGROUND_COLOR = a macro color
+	// TODO: White option
+
+    #if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
         #define _XL_PURPLE 0
         #define _XL_GREEN 1
         #define _XL_MAGENTA 0
@@ -259,7 +262,6 @@
         #endif
         #define _XL_BLACK 2
         
-        // TODO: Remove this hack and handle real black on white background
         #define _XL_WHITE _XL_BLUE
     #else
         #define _XL_WHITE 2
@@ -283,17 +285,29 @@
         
         // TODO: Remove this hack and handle real black on white background
         #define _XL_BLACK _XL_BLUE
-    #endif
-
+	#endif
 #elif defined(__ATARI_LYNX__) && defined(__LYNX_TGI_GRAPHICS)
-    #define _XL_BLACK 0x0
-    #define _XL_RED 0x2
-    #define _XL_WHITE 0x0F
-    #define _XL_BLUE 0xD
-    #define _XL_YELLOW 0x9
-    #define _XL_GREEN 0xA
-    #define _XL_CYAN 0xE
+	// 3 -> pink
+	// 0 -> white
+	// 4 -> grey 
+	// 5 -> darker grey ?
+	// 6 -> even darker grey
+	// 7 -> grey/red
+	// 8 -> light red
+	// B -> dark green
+	// C -> dark blue
+	
+	// #define _XL_BLACK 0x6
+	
 
+	#define _XL_BLACK 0x1
+	#define _XL_RED 0x2
+	#define _XL_WHITE 0x0F
+	#define _XL_BLUE 0xD
+	#define _XL_YELLOW 0x9
+	#define _XL_GREEN 0xA
+	#define _XL_CYAN 0xE
+	
 #elif defined(__SUPERVISION__)
 
     #define _AUX_BLACK 0xFF
@@ -361,11 +375,7 @@
     #define _XL_GREEN COLOR_GREEN
     #define _XL_CYAN COLOR_LTBLUE
 #elif defined(__CC65__) || defined(__TMC600__)
-    // TODO: Remove this hack
-    #if defined(__ATARI_LYNX__) && !defined(__LYNX_TGI_GRAPHICS)
-        #define _XL_BLACK COLOR_BLACK
-    #endif
-    
+
     #define _XL_BLACK COLOR_BLACK
     #define _XL_RED COLOR_RED
     #define _XL_WHITE COLOR_WHITE
@@ -390,7 +400,7 @@
     #define _XL_BLACK 8
     
 #elif defined(__MC1000__)
-    #if defined(_BACKGROUND_COLOR) && _BACKGROUND_COLOR==_XL_WHITE
+    #if defined(__BACKGROUND_COLOR) && __BACKGROUND_COLOR==1
         #define _XL_WHITE MAGENTA
         #define _XL_CYAN CYAN
         #define _XL_YELLOW MAGENTA
@@ -398,6 +408,7 @@
         #define _XL_RED RED
         #define _XL_MAGENTA MAGENTA
         #define _XL_BLUE BLUE
+        #define _XL_BLACK BLUE
     #else
         #define _XL_BLACK CYAN
         #define _XL_WHITE RED

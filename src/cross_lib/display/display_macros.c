@@ -240,7 +240,7 @@ void _XL_SET_TEXT_COLOR(uint8_t c)
 #endif
 
 
-#if defined(VDP_WAIT_V_SYNC)
+#if defined(__VDP_WAIT_V_SYNC)
     void vdp_waitvsync(void)
     { 
         #asm 
@@ -283,7 +283,11 @@ void _XL_SET_TEXT_COLOR(uint8_t c)
 
 #elif defined(__Z88DK_SPRITES_GRAPHICS)
 
-    #include "z88dk_sprites_definitions.h"
+	#if SPRITE_Y_SIZE==8
+		#include "z88dk_sprites_definitions.h"
+	#elif SPRITE_Y_SIZE==6
+		#include "z88dk_8x6_sprites_definitions.h"
+	#endif
     extern uint8_t sprites[];
 
 #elif defined(__BUFFERED_GRAPHICS)
@@ -294,6 +298,7 @@ void _XL_SET_TEXT_COLOR(uint8_t c)
     #endif
     uint8_t video_buffer[YSize+Y_OFFSET][XSize];
     
+    #if !defined(__DOUBLE_BUFFER)
     void display_all(void)
     {
         uint8_t j; 
@@ -312,6 +317,7 @@ void _XL_SET_TEXT_COLOR(uint8_t c)
             putchar(video_buffer[YSize+Y_OFFSET-LOWER_BORDER_OFFSET][i]);
         }
     }
+    #endif
 #elif defined(__MO5__)
 /*
 COLOR:
@@ -521,10 +527,10 @@ lda $a7c0
     void __draw_ch(uint8_t x, uint8_t y, uint8_t ch)
     {
         _XL_DELETE(x,y); 
-        if(ch!=_XL_SPACE)
-        {
+        // if(ch)
+        // {
             putsprite(spr_or,x*(__SPRITE_X_STEP),y*(__SPRITE_Y_STEP),sprites + ((ch-32U)*(2+SPRITE_Y_SIZE)));
-        }
+        // }
     }
 #endif
 
@@ -558,7 +564,7 @@ lda $a7c0
             DISPLAY_POKE(loc(x,y), (tile));
         }
     #else
-        void _XL_DRAW(uint8_t x, uint8_t y, uint8_t tile, uint8_t color)
+        void __DRAW_NO_COLOR(uint8_t x, uint8_t y, uint8_t tile)
         {
             DISPLAY_POKE(loc(x,y), (tile));
         }   
@@ -568,4 +574,25 @@ lda $a7c0
 	{
 		DISPLAY_POKE(loc(x,y), _SPACE);
 	}
+#endif
+
+#if defined(__DOUBLE_BUFFER) && !defined(__BUFFERED_GRAPHICS)
+    #if defined(__CC65__)
+        void _XL_REFRESH(void)
+            {
+                memcpy((uint8_t *)REAL_BASE_ADDR, (uint8_t *)BASE_ADDR,XSize*YSize);
+                // memcpy((uint8_t *)REAL_COLOR_ADDR, (uint8_t *)COLOR_ADDR,XSize*YSize);
+            }
+    #else
+        void _XL_REFRESH(void)
+        {
+            uint16_t i;
+           
+            for(i=0;i<(XSize)*(YSize);++i) \
+            {
+                POKE(REAL_BASE_ADDR+i,PEEK(BASE_ADDR+i));
+                // POKE(REAL_COLOR_ADDR+i,PEEK(COLOR_ADDR+i));
+            }
+        }
+    #endif
 #endif

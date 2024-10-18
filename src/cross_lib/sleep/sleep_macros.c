@@ -46,7 +46,7 @@
 		#define CYCLES 1000
 	#endif
 
-    #if defined(__ALT_SLEEP)
+    #if defined(__ALT_SLEEP) && !defined(_XL_NO_SLEEP_SEC)
 	void _XL_SLEEP(uint8_t sec)
 	{
         #if defined(__TI99__)
@@ -109,6 +109,7 @@
 
 			for(i=0;i<(t);++i)
 			{
+                // foo=42*PEEK(0xF000);
 				foo=42+i;
 			}
 		}

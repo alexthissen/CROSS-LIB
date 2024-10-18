@@ -245,18 +245,23 @@ int main(void)
         
         #if !defined(NO_INITIAL_SCREEN)
             initialScreen();
-            REFRESH();
+            _XL_REFRESH();
         #else
             printPressKeyToStart();                
         #endif
-        _XL_WAIT_FOR_INPUT();
-        _XL_CLEAR_SCREEN();
+        // _XL_WAIT_FOR_INPUT();
+        // _XL_CLEAR_SCREEN();
 
         #if !defined(LESS_TEXT)
             highScoreScreen();
-            REFRESH();
+            _XL_REFRESH();
             _XL_WAIT_FOR_INPUT();
             _XL_CLEAR_SCREEN();
+        #else
+            highScoreScreen();
+            // _XL_REFRESH();
+            _XL_WAIT_FOR_INPUT();
+            // _XL_CLEAR_SCREEN();
         #endif
 
         
@@ -340,7 +345,12 @@ int main(void)
             #endif
 
             #if !defined(FULL_GAME)
-                ghostSlowDown = INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256;
+                #if !defined(TINY_GAME)
+                    ghostSlowDown = INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256;
+                #else
+                    
+                    ghostSlowDown = INITIAL_GHOST_SLOWDOWN;
+                #endif
             #else
                 levelSlowDown = INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256;
                 ghostSlowDown = computeGhostSlowDown();
@@ -370,9 +380,14 @@ int main(void)
             #endif
             
             printPressKeyToStart();
-            REFRESH();
+            _XL_REFRESH();
+            #if !defined(TINY_GAME)
             _XL_WAIT_FOR_INPUT();
+            #endif
+            
+            #if !defined(TINY_GAME)
             _XL_CLEAR_SCREEN();
+            #endif
             
             fillLevelWithCharacters();
             #if !defined(TINY_GAME)
@@ -488,7 +503,10 @@ int main(void)
                         // Display ghosts
 						for(ind=0;ind<GHOSTS_NUMBER;++ind)
 						{
-							displayGhost(&ghosts[ind]);
+							if(!((loop+ind)&7))
+							{
+								displayGhost(&ghosts[ind]);
+							}
 						}
                     }
                     
@@ -592,11 +610,7 @@ int main(void)
                             ghostSlowDown = computeGhostSlowDown();
                         #endif
                         
-                        #if defined(BUGGY_VERTICAL_DRAW)
-                        DRAW_VERTICAL_LINE(XSize/2, 1+YSize/2-(verticalWallLength/2), verticalWallLength);            
-                        #else
                         DRAW_VERTICAL_LINE(XSize/2, YSize/2-(verticalWallLength/2), verticalWallLength);            
-                        #endif
                         if(ishorizWallsLevel)
                         {                
                             horizWallsLength = HORIZONTAL_WALLS_INITIAL_LENGTH + (level>>4) + (uint8_t) (loop/HORIZONTAL_WALLS_INCREASE_LOOP);        
@@ -630,7 +644,7 @@ int main(void)
                 #if defined(_XL_SLOW_DOWN_FACTOR) && _XL_SLOW_DOWN_FACTOR>0
                     _XL_SLOW_DOWN(_XL_SLOW_DOWN_FACTOR);
                 #endif
-                REFRESH();
+                _XL_REFRESH();
             }; // end inner while [while (player._alive && ghostCount>0), i.e., exit on death or end of level]
     
             #if defined(BENCHMARK)
@@ -685,7 +699,9 @@ int main(void)
                         bases_in_completed_levels+=bases;
                     }
                 #endif
+                #if !defined(TINY_GAME)
                 ++level;
+                #endif
             }
             else // if dead
             {        
@@ -733,10 +749,13 @@ int main(void)
 
         // GAME OVER    
         _XL_CLEAR_SCREEN();
+        #if !defined(TINY_GAME)
         displayScore();
         printGameOver();
-        
         _XL_WAIT_FOR_INPUT();
+
+        #endif
+
         
         if(points>highScore)
         {

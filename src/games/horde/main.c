@@ -319,7 +319,7 @@ static const uint8_t item_tile[5][2] =
 {
     { POWER_UP_TILE, _XL_WHITE },
     { ARROW_TILE_1, _XL_YELLOW },
-    { EXTRA_POINTS_TILE, _XL_YELLOW },
+    { EXTRA_POINTS_TILE, _XL_GREEN },
     { FREEZE_TILE, _XL_CYAN },
     { WALL_TILE, _XL_YELLOW },
 };
@@ -385,7 +385,7 @@ void display_power_up_counter(void)
     #define display_zombie_counter()
 #endif
 
-
+#if !defined(_XL_NO_COLOR)
 void display_remaining_arrows(void)
 {
     uint8_t color;
@@ -401,6 +401,12 @@ void display_remaining_arrows(void)
     _XL_SET_TEXT_COLOR(color);
     _XL_PRINTD(7,0,2,remaining_arrows);
 }
+#else
+void display_remaining_arrows(void)
+{
+    _XL_PRINTD(7,0,2,remaining_arrows);
+}
+#endif
 
 
 void recharge_arrows(uint8_t value)
@@ -454,7 +460,7 @@ void display_bow(void)
 }
 
 
-
+#if !defined(_XL_NO_COLOR)
 void display_zombie(void)
 {
     uint8_t status = zombie_shape[zombie_x];
@@ -535,6 +541,82 @@ void display_zombie(void)
         #endif
     }
 }
+#else
+void display_zombie(void)
+{
+    uint8_t status = zombie_shape[zombie_x];
+    uint8_t pos = zombie_y[zombie_x];
+    uint8_t tile0;
+
+    tile0 = BOSS_TILE_0;
+
+    if(zombie_level[zombie_x]==1)
+    {
+    }
+    else if(zombie_level[zombie_x]==2)
+    {
+        if(!freeze)
+        {
+            tile0 = ZOMBIE_DEATH_TILE;
+        }
+    }
+    else if(!zombie_level[zombie_x])
+    {
+        tile0 = MINION_TILE_0;
+    }
+    else 
+    {
+    }
+    if(freeze)
+    {
+    }
+
+    if(!status)
+    {
+        _XL_DELETE(zombie_x, zombie_y[zombie_x]-1);
+        _XL_DRAW(zombie_x, pos, tile0, color);
+    }
+    else
+    {
+        #if !defined(_XL_NO_UDG)
+        uint8_t tile1;
+
+        if(!zombie_level[zombie_x])
+        {
+            tile0 = zombie_tile[status<<1];
+            tile1 = zombie_tile[1+(status<<1)];
+        }
+        else
+        {
+            tile0 = boss_tile[status<<1];
+            tile1 = boss_tile[1+(status<<1)]; 
+        }
+        _XL_DRAW(zombie_x, pos, tile0, color);
+        _XL_DRAW(zombie_x,1 + pos, tile1, color);
+        #else
+        // Avoid using the upper border / beam tile in ASCII mode
+
+        if(!zombie_level[zombie_x])
+        {
+            
+            tile0 = MINION_TILE_0;
+        }
+        else
+        {
+            if((zombie_y[zombie_x])&1)
+            {
+                tile0 = BOSS_TILE_0;
+            }
+            else
+            {
+                tile0 = BOSS_TILE_1;
+            }
+        }
+        _XL_DRAW(zombie_x, pos, tile0, color);
+        #endif
+    }
+}
+#endif
 
 
 #define handle_extra_life() \
@@ -861,63 +943,34 @@ void power_up_effect(void)
     
     pmod10 = powerUp%10;    
 
-    #if defined(BUGGY_GCC_TI99)
-        if(pmod10==0)
-        {
+    switch(pmod10)
+    {
+        case 0:
             activate_hyper();
             #if !defined(_XL_NO_COLOR)
             powerUpItem._color = _XL_WHITE;
             #endif
-        } 
-        else if(pmod10==4)
-        {
+        break;
+        
+        case 4:
             #if !defined(_XL_NO_COLOR)
             powerUpItem._color = _XL_CYAN; 
             #endif
-        } 
-        else if(pmod10==5)
-        {
+        break;
+        
+        case 5:
             freeze_locked=0;
             #if !defined(_XL_NO_COLOR)
             powerUpItem._color = _XL_WHITE;
             #endif
-        }  
-        else if(pmod10==9)
-        {
+        break;
+        
+        case 9:
             #if !defined(_XL_NO_COLOR)
             powerUpItem._color = _XL_RED;
             #endif
-        }
-    #else
-        switch(pmod10)
-        {
-            case 0:
-                activate_hyper();
-                #if !defined(_XL_NO_COLOR)
-                powerUpItem._color = _XL_WHITE;
-                #endif
-            break;
-            
-            case 4:
-                #if !defined(_XL_NO_COLOR)
-                powerUpItem._color = _XL_CYAN; 
-                #endif
-            break;
-            
-            case 5:
-                freeze_locked=0;
-                #if !defined(_XL_NO_COLOR)
-                powerUpItem._color = _XL_WHITE;
-                #endif
-            break;
-            
-            case 9:
-                #if !defined(_XL_NO_COLOR)
-                powerUpItem._color = _XL_RED;
-                #endif
-            break;
-        } 
-    #endif
+        break;
+    } 
     
     display_power_up_counter();
     increase_score(POWERUP_POINTS);
@@ -1090,7 +1143,7 @@ void beam_effect(void)
             \
             extraPointsItem[i]._active = 0; \
             extraPointsItem[i]._tile = EXTRA_POINTS_TILE; \
-            extraPointsItem[i]._color = _XL_YELLOW; \
+            extraPointsItem[i]._color = _XL_GREEN; \
             extraPointsItem[i]._effect = extra_points_effect; \
         } \
     }
@@ -2225,17 +2278,7 @@ do \
     #define _HISCORE_Y 2
 #endif
 
-#if XSize>=20
-    #define _CROSS_HORDE_STRING \
-        "C R O S S  H O R D E"
-	#define _CROSS_LEN 20
-
-#else
-    #define _CROSS_HORDE_STRING \
-        "CROSS HORDE"
-	#define _CROSS_LEN 11
-#endif
-
+#define _HORDE_STRING "HORDE"
 
 #define display_initial_screen() \
 { \
@@ -2251,7 +2294,7 @@ do \
     _XL_PRINTD(XSize/2-3,_HISCORE_Y+1,5,hiscore); \
     \
     _XL_SET_TEXT_COLOR(_XL_RED); \
-    PRINT_CENTERED_ON_ROW(YSize/3-2,_CROSS_HORDE_STRING); \
+    PRINT_CENTERED_ON_ROW(YSize/3-2,_HORDE_STRING); \
     \
     _XL_SET_TEXT_COLOR(_XL_WHITE); \
     PRINT_CENTERED_ON_ROW(YSize/3, "FABRIZIO CARUSO"); \

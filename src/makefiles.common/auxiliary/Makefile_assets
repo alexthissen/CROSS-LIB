@@ -28,6 +28,9 @@ $(ASSETS_PATH)/7x8_chars.h: $(7X8_TILES)
 $(ASSETS_PATH)/8x8_chars.h: $(8X8_TILES)
 	$(CREATE_ASSET)
 
+$(ASSETS_PATH)/4x4_chars.h: $(4X4_TILES)
+	$(CREATE_ASSET)
+
 $(ASSETS_PATH)/cc65_nes_tiles.s: $(8X8_TILES)
 	$(CREATE_ASSET)
 
@@ -44,6 +47,9 @@ $(ASSETS_PATH)/cc65_udc.s: $(8X8_TILES)
 	$(CREATE_ASSET)
 
 $(ASSETS_PATH)/cc65_udc_arcade.s: $(8X8_TILES)
+	$(CREATE_ASSET)
+
+$(ASSETS_PATH)/cc65_udc_arcade_conio.s: $(8X8_TILES)
 	$(CREATE_ASSET)
 
 $(ASSETS_PATH)/cc65_udc_arcade_27_tiles_v2.s: $(8X8_TILES)
@@ -98,4 +104,9 @@ $(ASSETS_PATH)/8x6_tiles.s: $(8x6_TILES)
 	$(CREATE_ASSET)
     
 $(ASSETS_PATH)/8x6_c_definition.h: $(8x6_TILES)
+	$(CREATE_ASSET)
+
+
+
+$(ASSETS_PATH)/z88dk_8x6_sprites_definitions.h: $(8x6_TILES)
 	$(CREATE_ASSET)
