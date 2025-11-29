@@ -10,17 +10,19 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"./local-features/cc65": {},
-		"./local-features/z88dk": {},
-		"ghcr.io/devcontainers/features/python:1": {
-			"installTools": true,
-			"version": "os-provided"
-		},
-		"ghcr.io/devcontainers/features/java:1": {
-            "version": "8",
-            "installGradle": "false",
-            "installMaven": "false"
-        }
+		//"./local-features/cmoc": {}
+ 
+		"./local-features/cc65": {}
+		// "./local-features/z88dk": {},
+		// "ghcr.io/devcontainers/features/python:1": {
+		// 	"installTools": true,
+		// 	"version": "os-provided"
+		// },
+		// "ghcr.io/devcontainers/features/java:1": {
+        //     "version": "8",
+        //     "installGradle": "false",
+        //     "installMaven": "false"
+        // }
 	},
 
 	"runArgs": [

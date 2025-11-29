@@ -1,25 +1,40 @@
 #!/bin/sh
 set -e
 
+# Installation instructions
+# LWTools: http://www.lwtools.ca/
+# CMOC: http://sarrazip.com/dev/cmoc.html
+
 echo "Activating feature 'cmoc'"
+SOURCE_DIR=/usr/src
+LWTOOLS=lwtools-4.24
+CMOC=cmoc-0.1.97
+mkdir -p $SOURCE_DIR
 
-mkdir -p /usr/src
-cd /usr/src
-
-wget http://www.lwtools.ca/releases/lwtools/lwtools-4.23.tar.gz
-tar -xvf lwtools-4.23.tar.gz
-cd lwtools-4.23
+# Install LWTools
+cd $SOURCE_DIR
+wget http://www.lwtools.ca/releases/lwtools/$LWTOOLS.tar.gz
+tar -xvf $LWTOOLS.tar.gz
+rm $LWTOOLS.tar.gz
+cd $LWTOOLS
 make
 make install
 
-# apk add --no-cache -t .build_deps bison flex
+# Install dependencies for CMOC
+apt update
+apt install -y bison flex
 
-apt-get update
-apt-get install -y bison flex
-wget http://perso.b2b2c.ca/~sarrazip/dev/cmoc-0.1.88.tar.gz
-tar -xvf cmoc-0.1.88.tar.gz
-cd cmoc-0.1.88
+# Install CMOC itself
+cd $SOURCE_DIR
+wget http://gvlsywt.cluster051.hosting.ovh.net/dev/$CMOC.tar.gz
+tar -xvf $CMOC.tar.gz
+rm $CMOC.tar.gz
+cd $CMOC
 ./configure
 make
 make install
+
+# Clean up
 apt remove --purge -y bison flex
+cd $SOURCE_DIR
+rm -rf $LWTOOLS $CMOC
