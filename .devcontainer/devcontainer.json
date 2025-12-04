@@ -19,8 +19,6 @@
 		"ghcr.io/cross-lib/devcontainers-features/z88dk": { }
 	},
 
-	"runArgs": ["--network=host"]
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
