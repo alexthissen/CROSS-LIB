@@ -9,14 +9,13 @@
 			"version": "os-provided"
 		},
 		"ghcr.io/devcontainers/features/java:1": {
-            "version": "8",
             "installGradle": "false",
             "installMaven": "false"
         },
 		"ghcr.io/cross-lib/devcontainers-features/cc65": { },
-		"ghcr.io/cross-lib/devcontainers-features/cmoc": { },
+		"ghcr.io/cross-lib/devcontainers-features/cmoc": { }
 		// "ghcr.io/cross-lib/devcontainers-features/lcc1802": { },
-		"ghcr.io/cross-lib/devcontainers-features/z88dk": { }
+		// "ghcr.io/cross-lib/devcontainers-features/z88dk": { }
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
