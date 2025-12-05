@@ -15,7 +15,7 @@
         },
 		"ghcr.io/cross-lib/devcontainers-features/cc65": { },
 		"ghcr.io/cross-lib/devcontainers-features/cmoc": { },
-		"ghcr.io/cross-lib/devcontainers-features/lcc1802": { },
+		// "ghcr.io/cross-lib/devcontainers-features/lcc1802": { },
 		"ghcr.io/cross-lib/devcontainers-features/z88dk": { }
 	},
 
@@ -44,5 +44,6 @@
 		}
 	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	//"containerUser": "root"
 	// "remoteUser": "root"
 }
